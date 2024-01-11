@@ -127,9 +127,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="luminosity.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="temperature.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="luminosity.h" />
+    <ClInclude Include="temperature.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\aerospike-client-c-dependencies.1.0.2\build\native\aerospike-client-c-dependencies.targets" Condition="Exists('packages\aerospike-client-c-dependencies.1.0.2\build\native\aerospike-client-c-dependencies.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Este projeto faz referência a pacotes do NuGet que não estão presentes neste computador. Use a Restauração de Pacotes do NuGet para baixá-los.  Para obter mais informações, consulte http://go.microsoft.com/fwlink/?LinkID=322105. O arquivo ausente é {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\aerospike-client-c-dependencies.1.0.2\build\native\aerospike-client-c-dependencies.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\aerospike-client-c-dependencies.1.0.2\build\native\aerospike-client-c-dependencies.targets'))" />
+  </Target>
 </Project>
