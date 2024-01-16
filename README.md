@@ -5,7 +5,7 @@ Pedro Ferreira | 20493
 Tiago Ferreira | 20494
 Miguel Duarte  | 20506
 
-## grupo
+## Grupo
 
 | Número |        Nome      |
 | ------- | --------------- |
