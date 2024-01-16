@@ -26,12 +26,10 @@ void *thread11(void *arg) {
         if (count >= 10)
         {
             printf("-----------------------------\n");
-            // printf("|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d| -> Antes\n", buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6], buffer[7], buffer[8], buffer[9]);
             for (int i = 0; i < BUFFER_SIZE - 1; i++)
             {
                 buffer[i] = buffer[i + 1];
             }
-            // printf("|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d| -> Depois\n", buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6], buffer[7], buffer[8], buffer[9]);
             index = BUFFER_SIZE - 1;  // Posicionar no último elemento
         } else {
             index = count;  // Usar o índice atual
@@ -40,11 +38,8 @@ void *thread11(void *arg) {
         buffer[index] = temperature;
         printf("%s: Valor %d armazenado no buffer.\n", __func__, temperature);
 
-        // Incrementar o contador (limitado a 10)
-        // count = (count < 10) ? count + 1 : count;
         ++count;
 
-        pthread_cond_signal(&cond);
         pthread_mutex_unlock(&mutex);
     }
     printf("|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d| -> Depois\n", buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6], buffer[7], buffer[8], buffer[9]);
@@ -66,12 +61,10 @@ void *thread12(void *arg) {
         if (count >= 10)
         {
             printf("-----------------------------\n");
-            // printf("|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d| -> Antes\n", buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6], buffer[7], buffer[8], buffer[9]);
             for (int i = 0; i < BUFFER_SIZE - 1; i++)
             {
                 buffer[i] = buffer[i + 1];
             }
-            // printf("|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d| -> Depois\n", buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6], buffer[7], buffer[8], buffer[9]);
             index = BUFFER_SIZE - 1;  // Posicionar no último elemento
         } else {
             index = count;  // Usar o índice atual
@@ -80,15 +73,18 @@ void *thread12(void *arg) {
         buffer[index] = temperature;
         printf("%s: Valor %d armazenado no buffer.\n", __func__, temperature);
 
-        // Incrementar o contador (limitado a 10)
-        // count = (count < 10) ? count + 1 : count;
         ++count;
 
-        pthread_cond_signal(&cond);
         pthread_mutex_unlock(&mutex);
     }
     printf("|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d| -> Depois\n", buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6], buffer[7], buffer[8], buffer[9]);
     pthread_exit(NULL);
+}
+
+
+void *thread13(void *arg)
+{
+
 }
 
 int main()
@@ -105,6 +101,7 @@ int main()
     {
         pthread_create(&thread, NULL, thread11, NULL);
         pthread_create(&thread, NULL, thread12, NULL);
+        pthread_create(&thread, NULL, thread13, NULL);
         pthread_join(thread, NULL);
         printf("Processo filho 1 (PID=%d) do pai (PID=%d)\n", getpid(), getppid());
     }
