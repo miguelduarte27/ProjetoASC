@@ -1,1 +1,1 @@
-# Trabalho Arquitetura de Computadores
+# Trabalho Arquitetura de Sistemas Computacionais
