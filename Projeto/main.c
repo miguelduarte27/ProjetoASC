@@ -32,7 +32,7 @@ sem_t semaphore;  // Semáforo para controle do sinal
 
 // pthread
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+// pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 
 void mysleep(unsigned int seconds)
 {
@@ -228,6 +228,7 @@ int main()
     pthread_t pthread11, pthread12, pthread13, pthread21, pthread22, pthread23;
     pid_t pid1, pid2;
 
+    sem_init(&semaphore, 1, 0); // pshared = 1 para partilha entre processos
 
     // printf("Processo pai (PID=%d)\n", getpid());
     pid1 = fork();
@@ -267,7 +268,8 @@ int main()
         printf("Processo pai do primeiro filho (PID=%d)\n", getpid());
     }
     pthread_mutex_destroy(&mutex);
-    pthread_cond_destroy(&cond);
+    sem_destroy(&semaphore);
+    // pthread_cond_destroy(&cond);
 
     return 0;
 }
