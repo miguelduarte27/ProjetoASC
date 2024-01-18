@@ -82,12 +82,13 @@ void *thread_temperatura(void *arg)
     printf("######################## Temperatura Thread: %d ########################\n", numThread);
     while (count < countMax )
     {
-        mysleep(1);
+        mysleep(5);
         int temperature = rand() % 25;  // Gerar valor de temperatura
         pthread_mutex_lock(&mutex);
 
         // Se o buffer estiver cheio, shift para a esquerda
-        if (globalCountTemp >= 10)
+        // if (globalCountTemp >= 10)
+        if(idxTemp + 1 <= 10)
         {
             for (int i = 0; i < BUFFER_SIZE - 1; i++)
             {
@@ -96,7 +97,8 @@ void *thread_temperatura(void *arg)
             idxTemp = BUFFER_SIZE - 1;  // Posicionar no último elemento
         }
         bufferTemp[idxTemp] = temperature;
-        if(globalCountTemp >= 9)
+        // if(globalCountTemp >= 9)
+        if(idxTemp >= 9)
         {
             printf("Chamei o thread 13 | %s\n", __func__);
             pthread_cond_signal(&cond);
@@ -115,7 +117,7 @@ void *thread_temperatura(void *arg)
     printf("pthread_exit: %s\n", __func__);
     pthread_exit(NULL);
 }
-void *thread13(void *arg)
+void *thread13(void *arg) // Thread Media
 {
     int sum = 0;
     while(!quitTemp)
@@ -159,12 +161,13 @@ void *thread_luminosidade(void *arg)
     printf("######################## Luminosidade Thread: %d ########################\n", numThread);
     while (count < countMax )
     {
-        mysleep(1);
+        mysleep(5);
         int luminosidade = rand() % 101;  // Gerar valor de temperatura
         pthread_mutex_lock(&mutex);
 
         // Se o buffer estiver cheio, shift para a esquerda
-        if (globalCountLum >= 10)
+        // if (globalCountLum >= 10)
+        if(idxLum + 1 <= 10)
         {
             for (int i = 0; i < BUFFER_SIZE - 1; i++)
             {
@@ -173,7 +176,8 @@ void *thread_luminosidade(void *arg)
             idxLum = BUFFER_SIZE - 1;  // Posicionar no último elemento
         }
         bufferLum[idxLum] = luminosidade;
-        if(globalCountLum >= 9)
+        // if(globalCountLum >= 9)
+        if(idxLum == 9)
         {
             printf("Chamei o thread 23 | %s\n", __func__);
             pthread_cond_signal(&cond);
@@ -182,7 +186,7 @@ void *thread_luminosidade(void *arg)
         printf("|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d| %s %i | Thread: %d\n", bufferLum[0], bufferLum[1], bufferLum[2], bufferLum[3], bufferLum[4], bufferLum[5], bufferLum[6], bufferLum[7], bufferLum[8], bufferLum[9], __func__, getpid(), numThread);
 
         idxLum != 9 ? idxLum++ : idxLum;
-        ++globalCountLum;
+        // ++globalCountLum;
         ++count;
 
         pthread_mutex_unlock(&mutex);
@@ -207,7 +211,7 @@ void *thread23(void *arg)
         }
         printf("\n");
         int media = sum / BUFFER_SIZE;
-        printf("-> %s: Média das temperaturas = %d\n", __func__, media);
+        printf("-> %s: Média da Luminosidade = %d\n", __func__, media);
         controla_focos(media);
         printf("-------------------------------------\n");
         pthread_mutex_unlock(&mutex);
@@ -235,7 +239,7 @@ int main()
         pthread_join(pthread13, NULL);
 
 
-        // printf("Processo filho 1 (PID=%d) do pai (PID=%d)\n", getpid(), getppid());
+        printf("Processo filho 1 (PID=%d) do pai (PID=%d)\n", getpid(), getppid());
     }
     else if (pid1 > 0)// Processo pai
     {
@@ -249,14 +253,15 @@ int main()
             pthread_join(pthread21, NULL);
             pthread_join(pthread22, NULL);
             pthread_join(pthread23, NULL);
-            printf("Processo filho 2 (PID=%d) do filho 1 (PID=%d)\n", getpid(), getppid());
+            printf("Processo filho 2 (PID=%d) do pai (PID=%d)\n", getpid(), getppid());
         }
         else if (pid2 > 0) // Pai do segundo filho
         {
             waitpid(pid1, NULL, 0);
             waitpid(pid2, NULL, 0);
-            // printf("Processo pai do segundo filho (PID=%d)\n", getpid());
+            printf("Processo pai do segundo filho (PID=%d)\n", getpid());
         }
+        printf("Processo pai do primeiro filho (PID=%d)\n", getpid());
     }
     pthread_mutex_destroy(&mutex);
     pthread_cond_destroy(&cond);
