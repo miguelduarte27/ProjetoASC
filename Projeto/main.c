@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include <time.h>
 #include <stdbool.h>
+#include <semaphore.h>
 
 // Variáveis globais para compartilhar entre as threads
 #define BUFFER_SIZE 10
@@ -26,6 +27,8 @@ int bufferLum[BUFFER_SIZE];
 int idxLum = 0;
 int globalCountLum = 0;
 bool quitLum = false;
+
+sem_t semaphore;  // Semáforo para controle do sinal
 
 // pthread
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -82,13 +85,12 @@ void *thread_temperatura(void *arg)
     printf("######################## Temperatura Thread: %d ########################\n", numThread);
     while (count < countMax )
     {
-        mysleep(5);
+        mysleep(1);
         int temperature = rand() % 25;  // Gerar valor de temperatura
         pthread_mutex_lock(&mutex);
 
         // Se o buffer estiver cheio, shift para a esquerda
-        // if (globalCountTemp >= 10)
-        if(idxTemp + 1 <= 10)
+        if (globalCountTemp >= 10)
         {
             for (int i = 0; i < BUFFER_SIZE - 1; i++)
             {
@@ -97,14 +99,14 @@ void *thread_temperatura(void *arg)
             idxTemp = BUFFER_SIZE - 1;  // Posicionar no último elemento
         }
         bufferTemp[idxTemp] = temperature;
-        // if(globalCountTemp >= 9)
-        if(idxTemp >= 9)
+        if(idxTemp == 9)
         {
             printf("Chamei o thread 13 | %s\n", __func__);
-            pthread_cond_signal(&cond);
+            // pthread_cond_signal(&cond);  Perguntar ao stor
+            sem_post(&semaphore);
         }
 
-        printf("|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d| %s %i | Thread: %d\n", bufferTemp[0], bufferTemp[1], bufferTemp[2], bufferTemp[3], bufferTemp[4], bufferTemp[5], bufferTemp[6], bufferTemp[7], bufferTemp[8], bufferTemp[9], __func__, getpid(), numThread);
+        printf("|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d| %s %i | Thread: %d | Count: %d\n", bufferTemp[0], bufferTemp[1], bufferTemp[2], bufferTemp[3], bufferTemp[4], bufferTemp[5], bufferTemp[6], bufferTemp[7], bufferTemp[8], bufferTemp[9], __func__, getpid(), numThread, globalCountTemp);
 
         idxTemp != 9 ? idxTemp++ : idxTemp;
         ++globalCountTemp;
@@ -122,8 +124,9 @@ void *thread13(void *arg) // Thread Media
     int sum = 0;
     while(!quitTemp)
     {
+        sem_wait(&semaphore);
         pthread_mutex_lock(&mutex);
-        pthread_cond_wait(&cond, &mutex);
+        // pthread_cond_wait(&cond, &mutex);
         sum = 0;
         // Calcula a média das temperaturas no buffer
         for (int i = 0; i < BUFFER_SIZE; ++i)
@@ -132,7 +135,7 @@ void *thread13(void *arg) // Thread Media
         }
         printf("\n");
         int media = sum / BUFFER_SIZE;
-        printf("-> %s: Média das temperaturas = %d\n", __func__, media);
+        printf("-> %s: Média das temperaturas = %d | Count: %d\n", __func__, media, globalCountTemp - 1);
         controla_ac( media > AC_ON_TEMP ? AC_ON : AC_OFF);
         printf("-------------------------------------\n");
         pthread_mutex_unlock(&mutex);
@@ -161,13 +164,12 @@ void *thread_luminosidade(void *arg)
     printf("######################## Luminosidade Thread: %d ########################\n", numThread);
     while (count < countMax )
     {
-        mysleep(5);
+        mysleep(1);
         int luminosidade = rand() % 101;  // Gerar valor de temperatura
         pthread_mutex_lock(&mutex);
 
         // Se o buffer estiver cheio, shift para a esquerda
-        // if (globalCountLum >= 10)
-        if(idxLum + 1 <= 10)
+        if (globalCountLum >= 10)
         {
             for (int i = 0; i < BUFFER_SIZE - 1; i++)
             {
@@ -176,17 +178,17 @@ void *thread_luminosidade(void *arg)
             idxLum = BUFFER_SIZE - 1;  // Posicionar no último elemento
         }
         bufferLum[idxLum] = luminosidade;
-        // if(globalCountLum >= 9)
         if(idxLum == 9)
         {
             printf("Chamei o thread 23 | %s\n", __func__);
-            pthread_cond_signal(&cond);
+            sem_post(&semaphore);
+            // pthread_cond_signal(&cond);
         }
 
-        printf("|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d| %s %i | Thread: %d\n", bufferLum[0], bufferLum[1], bufferLum[2], bufferLum[3], bufferLum[4], bufferLum[5], bufferLum[6], bufferLum[7], bufferLum[8], bufferLum[9], __func__, getpid(), numThread);
+        printf("|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d| %s %i | Thread: %d | Count: %d\n", bufferLum[0], bufferLum[1], bufferLum[2], bufferLum[3], bufferLum[4], bufferLum[5], bufferLum[6], bufferLum[7], bufferLum[8], bufferLum[9], __func__, getpid(), numThread, globalCountLum);
 
         idxLum != 9 ? idxLum++ : idxLum;
-        // ++globalCountLum;
+        ++globalCountLum;
         ++count;
 
         pthread_mutex_unlock(&mutex);
@@ -201,8 +203,9 @@ void *thread23(void *arg)
     int sum = 0;
     while(!quitLum)
     {
+        sem_wait(&semaphore);
         pthread_mutex_lock(&mutex);
-        pthread_cond_wait(&cond, &mutex);
+        // pthread_cond_wait(&cond, &mutex);
         sum = 0;
         // Calcula a média das temperaturas no buffer
         for (int i = 0; i < BUFFER_SIZE; ++i)
@@ -211,7 +214,7 @@ void *thread23(void *arg)
         }
         printf("\n");
         int media = sum / BUFFER_SIZE;
-        printf("-> %s: Média da Luminosidade = %d\n", __func__, media);
+        printf("-> %s: Média da Luminosidade = %d | Count: %d\n", __func__, media, globalCountLum - 1);
         controla_focos(media);
         printf("-------------------------------------\n");
         pthread_mutex_unlock(&mutex);
